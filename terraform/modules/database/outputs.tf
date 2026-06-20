@@ -1,0 +1,4 @@
+output "db_host" {
+  value       = aws_db_instance.this.address
+  description = "database connection endpoint"
+}

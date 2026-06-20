@@ -1,0 +1,10 @@
+# folders
+.terraform
+
+# files
+*.zip
+terraform.tfvars
+
+# AI
+.claude
+.serena
