@@ -1,0 +1,38 @@
+services:
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    image: template-api-img
+    container_name: template-api
+    working_dir: /app
+    environment:
+      - POSTGRES_DB=pokemon
+      - POSTGRES_USER=pokemon
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+    volumes:
+      - ./api:/app
+      - api:/app/.venv
+    ports:
+      - 3032:80
+    command: bash -c "uv sync"
+
+  db:
+    image: postgres:17.4
+    container_name: template-db
+    environment:
+      - POSTGRES_DB=pokemon
+      - POSTGRES_USER=pokemon
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - db:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+volumes:
+  api:
+    name: template-api-vol
+  db:
+    name: template-db-vol
