@@ -1,6 +1,6 @@
 ## ECS Service
 resource "aws_ecs_service" "this" {
-  name            = "${var.project_name}-ecs-service"
+  name            = "${var.project_name}-${var.container_type}-service"
   cluster         = var.cluster_id
   desired_count   = 1
   launch_type     = "FARGATE"
@@ -20,7 +20,7 @@ resource "aws_ecs_service" "this" {
 
 ## Task Definition
 resource "aws_ecs_task_definition" "container" {
-  family                   = "${var.project_name}-task-definition"
+  family                   = "${var.project_name}-${var.container_type}-task-definition"
   network_mode             = "awsvpc"
   cpu                      = 256
   memory                   = 512

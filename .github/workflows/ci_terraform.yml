@@ -6,7 +6,7 @@ on:
       - main
       - develop
     paths:
-      - "*"
+      - "terraform/**"
       - ".github/workflows/ci_terraform.yml"
       - "!terraform/README.md"
 
@@ -40,19 +40,19 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
 
-      - name: Terraform setup
-        uses: ./.github/actions/setup
+      - name: Setup AWS Credentials
+        uses: ./.github/actions/credential
         with:
-          terraform_version: ${{ env.TERRAFORM_VERSION }}
-          tfcmt_version: v${{ env.TFCMT_VERSION }}
           aws_role_arn: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           aws_profile: ${{ env.AWS_PROFILE_ACCOUNT }}
           region: ${{ env.AWS_REGION }}
 
-      - name: Setup TFLint
-        uses: terraform-linters/setup-tflint@b480b8fcdaa6f2c577f8e4fa799e89e756bb7c93 # v6.2.2
+      - name: Terraform setup
+        uses: ./.github/actions/setup
         with:
-          tflint_version: v${{ env.TFLINT_VERSION }}
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+          tfcmt_version: ${{ env.TFCMT_VERSION }}
+          tflint_version: ${{ env.TFLINT_VERSION }}
 
       - name: Terraform Format
         run: terraform fmt
@@ -92,14 +92,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
+
+      - name: Setup AWS Credentials
+        uses: ./.github/actions/credential
+        with:
+          aws_role_arn: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws_profile: ${{ env.AWS_PROFILE_ACCOUNT }}
+          region: ${{ env.AWS_REGION }}
+
       - name: Terraform setup
         uses: ./.github/actions/setup
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
-          tfcmt_version: v${{ env.TFCMT_VERSION }}
-          aws_role_arn: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          aws_profile: ${{ env.AWS_PROFILE_ACCOUNT }}
-          region: ${{ env.AWS_REGION }}
+          tfcmt_version: ${{ env.TFCMT_VERSION }}
+          tflint_version: ${{ env.TFLINT_VERSION }}
 
       - name: Terraform Init
         run: terraform init

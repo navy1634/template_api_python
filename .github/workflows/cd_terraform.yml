@@ -5,7 +5,7 @@ on:
       - main
       - develop
     paths:
-      - "*"
+      - "terraform/**"
       - ".github/workflows/cd_terraform.yml"
       - "!terraform/README.md"
 
@@ -16,6 +16,7 @@ env:
   AWS_REGION: ap-northeast-1
   TERRAFORM_VERSION: 1.15.5
   TFCMT_VERSION: 4.14.15
+  TFLINT_VERSION: 0.63.1
 
 permissions:
   id-token: write
@@ -35,14 +36,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
+      - name: Setup AWS Credentials
+        uses: ./.github/actions/credential
+        with:
+          aws_role_arn: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws_profile: ${{ env.AWS_PROFILE_ACCOUNT }}
+          region: ${{ env.AWS_REGION }}
+
       - name: Terraform setup
         uses: ./.github/actions/setup
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
-          tfcmt_version: v${{ env.TFCMT_VERSION }}
-          aws_role_arn: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          aws_profile: ${{ env.AWS_PROFILE_ACCOUNT }}
-          region: ${{ env.AWS_REGION }}
+          tfcmt_version: ${{ env.TFCMT_VERSION }}
+          tflint_version: ${{ env.TFLINT_VERSION }}
 
       - name: Terraform Init
         run: terraform init
