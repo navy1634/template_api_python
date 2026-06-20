@@ -8,6 +8,10 @@ data "aws_secretsmanager_secret" "db" {
   name = "rds/template/secrets"
 }
 
+data "aws_secretsmanager_secret_version" "db" {
+  secret_id = data.aws_secretsmanager_secret.db.id
+}
+
 # VPC
 module "vpc" {
   source       = "../../modules/vpc"
@@ -73,8 +77,8 @@ module "database" {
   project_name              = local.project
   instance_type             = "db.t4g.micro"
   engine_version            = "18.3"
-  db_user                   = "${data.aws_secretsmanager_secret.db.arn}:username::"
-  db_password               = "${data.aws_secretsmanager_secret.db.arn}:password::"
+  db_user                   = jsondecode(data.aws_secretsmanager_secret_version.db.secret_string)["username"]
+  db_password               = jsondecode(data.aws_secretsmanager_secret_version.db.secret_string)["password"]
   vpc_id                    = module.vpc.vpc_id
   private_subnet_ids        = module.vpc.private_subnet_ids
   private_subnet_cidr_block = module.vpc.private_subnet_cidr_blocks[0]
