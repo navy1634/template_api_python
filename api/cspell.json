@@ -1,0 +1,22 @@
+{
+    "version": "0.2",
+    "ignorePaths": [],
+    "dictionaryDefinitions": [],
+    "dictionaries": [],
+    "words": [
+        "autoflush",
+        "fastapi",
+        "pkstatus",
+        "psycopg",
+        "pytest",
+        "sessionmaker",
+        "subinfo",
+        "testcontainers",
+        "sqlalchemy",
+        "usecase",
+        "uvicorn",
+        "venv"
+    ],
+    "ignoreWords": [],
+    "import": []
+}
