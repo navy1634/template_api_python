@@ -5,10 +5,17 @@
     "dictionaries": [],
     "words": [
         "autoflush",
+        "fastapi",
         "pkstatus",
         "psycopg",
+        "pytest",
+        "sessionmaker",
         "subinfo",
-        "usecase"
+        "testcontainers",
+        "sqlalchemy",
+        "usecase",
+        "uvicorn",
+        "venv"
     ],
     "ignoreWords": [],
     "import": []

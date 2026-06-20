@@ -1,7 +1,7 @@
 import os
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
 
 
 class ConnectDatabase:
@@ -15,5 +15,5 @@ class ConnectDatabase:
         self.engine = create_engine(DATABASE_URL)
         self.session = sessionmaker(autocommit=False, autoflush=True, bind=self.engine)
 
-    def get_session(self):
+    def get_session(self) -> sessionmaker[Session]:
         return self.session

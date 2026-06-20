@@ -1,5 +1,6 @@
 # folders
 .venv
+.ruff_cache
 .mypy_cache
 .pytest_cache
 __pycache__

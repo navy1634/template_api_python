@@ -20,7 +20,7 @@ services:
     command: bash -c "uv sync"
 
   db:
-    image: postgres:17.4
+    image: postgres:18.4
     container_name: template-db
     environment:
       - POSTGRES_DB=pokemon
