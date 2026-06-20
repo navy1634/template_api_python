@@ -10,7 +10,9 @@ on:
       - "!api/README.md"
 
 env:
-  REGION: ap-northeast-1
+  AWS_PROFILE_ACCOUNT: default
+  AWS_REGION: ap-northeast-1
+  project_name: template
 
 permissions:
   id-token: write
@@ -20,7 +22,7 @@ jobs:
   deploy:
     name: api CD
     runs-on: ubuntu-latest
-    environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'development' }}
+    environment: ${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}
 
     steps:
       # リポジトリをチェックアウト
@@ -28,37 +30,46 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       # Login
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@e7f100cf4c008499ea8adda475de1042d6975c7b # v6.2.0
+      - name: Setup AWS Credentials
+        uses: ./.github/actions/credential
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          aws-region: ${{ env.REGION }}
+          aws_role_arn: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws_profile: ${{ env.AWS_PROFILE_ACCOUNT }}
+          region: ${{ env.AWS_REGION }}
 
+      # Docker イメージをプッシュ
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@d539f0932e70871a027e9d5a9d8fc38589180a64 # v2.1.6
 
-      # Docker イメージをプッシュ
       - name: Push Docker image to AWS ECR
         uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # v7.2.0
         with:
           context: ./api
           push: true
-          tags: ${{ steps.login-ecr.outputs.registry }}/pokemon-api-backend:latest
+          tags: ${{ steps.login-ecr.outputs.registry }}/${{ env.project_name }}/api:latest
+
+      # タスク定義の更新
+      - name: Download task definition
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition ${{ env.project_name }}-api-task-definition \
+            --query taskDefinition \
+            > ecs-task-def.json
 
       - name: update ECS service
         uses: aws-actions/amazon-ecs-render-task-definition@6853cfae8c3a7d978fbf68b5a55453395541dfbb # v1.8.5
         with:
-          task-definition: ./api/ecs-task-def.json
-          container-name: pokemon-api-backend
-          image: ${{ steps.login-ecr.outputs.registry }}/pokemon-api-backend:latest
+          task-definition: ecs-task-def.json
+          container-name: ${{ env.project_name }}/api
+          image: ${{ steps.login-ecr.outputs.registry }}/${{ env.project_name }}/api:latest
 
       - name: update ECS service with new image
         uses: aws-actions/amazon-ecs-deploy-task-definition@a310a830f5c14e583e35d84e4e1ec7dd177c3c9c # v2.6.2
         with:
-          task-definition: ./api/ecs-task-def.json
-          service: pokemon-api-backend-service
-          cluster: pokemon-api-cluster
+          task-definition: ecs-task-def.json
+          cluster: ${{ env.project_name }}-cluster
+          service: ${{ env.project_name }}-api-service
           wait-for-service-stability: true
 
       - name: Close Connection
