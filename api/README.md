@@ -54,14 +54,14 @@ api/
 
 ### 依存関係のインストール
 
-```bash
+```sh
 cd api
 uv sync
 ```
 
 ### 開発サーバーの起動
 
-```bash
+```sh
 uv run task dev
 ```
 
@@ -78,7 +78,7 @@ API は `http://localhost:80` で起動します。
 
 ## 開発コマンド
 
-```bash
+```sh
 # 依存パッケージのインストール
 uv sync
 
@@ -93,6 +93,30 @@ uv run task type-check
 
 # テスト
 uv run task test
+```
+
+## ローカル開発のデータベース migration
+
+以下は `compose.yml` で起動した PostgreSQL に対する、ローカル開発用の手順です。本番環境の migration 実行経路はこのリポジトリでは定義していません。
+
+Alembic は `compose.yml` の `DATABASE_*` 環境変数を使って PostgreSQL に接続します。
+
+```sh
+docker compose up -d db
+```
+
+モデルを追加した後、migration ファイルを作成して適用します。
+
+```sh
+docker compose run --rm api uv run task migration-revision -- "変更内容"
+docker compose run --rm api uv run task migration-upgrade
+```
+
+現在の適用状況を確認したり、直前の migration を戻したりできます。
+
+```sh
+docker compose run --rm api uv run task migration-current
+docker compose run --rm api uv run task migration-downgrade
 ```
 
 ## エンドポイント

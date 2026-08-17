@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "alembic>=1.18.5",
     "fastapi>=0.136.3",
     "psycopg2>=2.9.12",
     "sqlalchemy>=2.0.50",
@@ -94,3 +95,7 @@ format-check = "ruff format --check ."
 type-check = "mypy . --strict"
 dev = "uvicorn app.main:app --host 0.0.0.0 --port 80 --reload"
 test = "pytest"
+migration-current = "alembic current"
+migration-revision = "alembic revision --autogenerate -m"
+migration-upgrade = "alembic upgrade head"
+migration-downgrade = "alembic downgrade -1"

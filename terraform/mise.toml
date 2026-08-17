@@ -1,0 +1,11 @@
+[tools]
+terraform = "1.15.8"
+tflint = "0.64.0"
+
+[tasks.lint]
+run = "tflint --config=$(pwd)/.tflint.hcl --recursive"
+description = "lint"
+
+[tasks.format]
+run = "terraform fmt -recursive"
+description = "format"
